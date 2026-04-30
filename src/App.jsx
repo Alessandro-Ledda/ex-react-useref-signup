@@ -1,4 +1,8 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
+
+const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()-_=+[{]};:'\",<.>/?\\|`~";
 
 
 function App() {
@@ -21,6 +25,36 @@ function App() {
   // setto var di stato per textarea
   const [description, setDescription] = useState("");
 
+  // validazione campi con useMemo(alternativa di useeffect per semplicita e codice piu leggeibile)
+  // validazione Username
+  const isUsernameValid = useMemo(() => {
+    // splittiamo creando un arrey delle singole lettere della stringa e per ognuna verifichiamo
+    const charsValid = username.split("").every(char => letters.includes(char) ||
+      numbers.includes(char)
+    );
+    // almeno sei caratteri alfanumerici
+    return charsValid && username.trim().length >= 6;
+  }, [username])
+
+  // validazione Password
+  const passwordIsValid = useMemo(() => {
+    return (
+      password.trim().length >= 8 &&
+      // alemeno uno dei carrateri deve essere presente
+      password.split("").some(char => letters.includes(char)) &&
+      password.split("").some(char => numbers.includes(char)) &&
+      password.split("").some(char => symbols.includes(char))
+    )
+  }, [password])
+
+  // validazione Description (textarea)
+  const descriptionIsValid = useMemo(() => {
+    return (
+      description.trim().length >= 100 &&
+      description.trim().length < 1000
+    )
+  }, [description])
+
   // funzione sabmit
   const handleSubmit = e => {
     e.preventDefault();
@@ -31,7 +65,10 @@ function App() {
       !selectedSpec.trim() ||
       !yearExp.trim() ||
       yearExp <= 0 ||
-      !description.trim()
+      !description.trim() ||
+      !isUsernameValid ||
+      !passwordIsValid ||
+      !descriptionIsValid
     ) {
       alert("Attenzione: compilare correttamente i campi");
       return;
@@ -72,6 +109,12 @@ function App() {
             value={username}
             onChange={e => setUsername(e.target.value)}
           />
+          {/* messaggio compilazione (corretto o errato)  */}
+          {username.trim() && (
+            <p style={{ color: isUsernameValid ? 'green' : 'red' }}>
+              {isUsernameValid ? 'username valido' : 'deve contenere almeno 6 caratteri alfanumerici'}
+            </p>
+          )}
         </label>
 
 
@@ -80,11 +123,16 @@ function App() {
         <label>
           <p>password</p>
           <input
-            type="number"
+            type="password"
             placeholder="inserisci password"
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
+          {password.trim() && (
+            <p style={{ color: passwordIsValid ? 'green' : 'red' }}>
+              {passwordIsValid ? 'password valida' : 'la password deve contenere almeno 8 caratteri di cui un numero una lettera e un simbolo'}
+            </p>
+          )}
         </label>
 
 
@@ -123,6 +171,11 @@ function App() {
             onChange={e => setDescription(e.target.value)}
           >
           </textarea>
+          {description.trim() && (
+            <p style={{ color: descriptionIsValid ? 'green' : 'red' }}>
+              {descriptionIsValid ? 'descrizione valida' : `deve contenere un renge di caratteri maggiore di 100 e minore di 1000 (${description.trim().length})`}
+            </p>
+          )}
         </label>
         {/* bottone per la registrazione */}
         <button type="submit">Send</button>
