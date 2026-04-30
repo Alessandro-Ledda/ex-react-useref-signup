@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useRef } from "react"
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const numbers = "0123456789";
@@ -7,23 +7,21 @@ const symbols = "!@#$%^&*()-_=+[{]};:'\",<.>/?\\|`~";
 
 function App() {
 
-  // setto var per gestione nome user
-  const [name, setName] = useState("");
+  // campi controllati (usestate)
 
   // setto var di stato per gestione username
   const [username, setUsername] = useState("");
 
   // setto var di stato per gestione password
   const [password, setPassword] = useState("");
-
-  // setto var di stato per gestione specializzazione
-  const [selectedSpec, setSelectedSpec] = useState("");
-
-  // setto var di stato per gestione anni di esperienza
-  const [yearExp, setYearExp] = useState("");
-
   // setto var di stato per textarea
   const [description, setDescription] = useState("");
+
+  // campi non controllati (useref)
+
+  const nameRef = useRef();
+  const selectedSpecRef = useRef();
+  const yearExpRef = useRef();
 
   // validazione campi con useMemo(alternativa di useeffect per semplicita e codice piu leggeibile)
   // validazione Username
@@ -58,6 +56,12 @@ function App() {
   // funzione sabmit
   const handleSubmit = e => {
     e.preventDefault();
+
+    // valori non controllati
+    const name = nameRef.current.value;
+    const selectedSpec = selectedSpecRef.current.value;
+    const yearExp = yearExpRef.current.value;
+
     if (
       !name.trim() ||
       !username.trim() ||
@@ -87,14 +91,15 @@ function App() {
   return (
     <>
 
+      {/* nome completo */}
+
       <form onSubmit={handleSubmit}>
         <label>
           <p>nome completo</p>
           <input
             type="text"
             placeholder="inserisci name"
-            value={name}
-            onChange={e => setName(e.target.value)}
+            ref={nameRef}
           />
         </label>
 
@@ -140,8 +145,9 @@ function App() {
         <label>
           <p>Specializzazioni</p>
           <select
-            value={selectedSpec}
-            onChange={(e) => setSelectedSpec(e.target.value)}
+            // value={selectedSpec}
+            // onChange={(e) => setSelectedSpec(e.target.value)}
+            ref={selectedSpecRef}
           >
             <option value="">Scegli specilaizzazione</option>
             <option value="full stack">full stack</option>
@@ -157,8 +163,7 @@ function App() {
           <input
             type="number"
             placeholder="inserisci anni di esperienza"
-            value={yearExp}
-            onChange={e => setYearExp(e.target.value)}
+            ref={yearExpRef}
           />
         </label>
 
