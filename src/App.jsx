@@ -1,4 +1,4 @@
-import { useState, useMemo, useRef } from "react"
+import { useState, useMemo, useRef, useEffect } from "react"
 
 const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const numbers = "0123456789";
@@ -87,13 +87,35 @@ function App() {
     })
   }
 
+  // focus sul nome completo attraverso useeffect(ci permette di scrivere subito nel campo)
+  useEffect(() => {
+    nameRef.current.focus();
+  }, []);
+
+  // logica bottone reset
+  const resetForm = (e) => {
+    e.preventDefault();
+    // per i campi controllati settare la var di stato a stringa vuota
+    setUsername("")
+    setPassword("")
+    setDescription("")
+    // per i campi non controllati
+    nameRef.current.value = "";
+    selectedSpecRef.current.value = "";
+    yearExpRef.current.value = "";
+    // possiamo aggiungere anche il focus per tornare allo stato iniziale
+    nameRef.current.focus();
+  }
+
+  // var per settagio riferimento per bottone (formRef) + onclick al bottone 
+  const formRef = useRef();
 
   return (
     <>
 
       {/* nome completo */}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} ref={formRef}>
         <label>
           <p>nome completo</p>
           <input
@@ -184,7 +206,16 @@ function App() {
         </label>
         {/* bottone per la registrazione */}
         <button type="submit">Send</button>
+        {/* bottone per lo svuotamento dei campi dopo l'invio */}
+        <button
+          onClick={resetForm}
+        >reset</button>
       </form>
+      {/* creiamo un footer ipotetico per l'efetto di scroll */}
+      <button className="scroll" onClick={() => {
+        formRef.current.scrollIntoView({ behavior: 'smooth' })
+      }}>Torna su</button>
+      <footer style={{ height: '100vh' }}></footer>
     </>
   )
 }
